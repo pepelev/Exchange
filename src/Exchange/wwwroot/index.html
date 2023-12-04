@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exchange</title>
+</head>
+<body style="display: flex; flex-direction: column;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 0 0.5rem; margin: 0 auto;">
+        <label>
+            Key:
+            <input id="key" value="secret" style="width: 15rem;">
+        </label>
+        <label>
+            <span style="vertical-align: top;">Content:</span>
+            <textarea id="text" style="width: 40rem; min-height: 5rem;"></textarea>
+        </label>
+        <button id="send" style="align-self: end;">Send</button>
+        <span id="send-status" style="align-self: end;"></span>
+        <span style="align-self: end;">
+            Follow <a id="receive-link" href="contents/a">link</a> to receive
+        </span>
+    </div>
+    <script>
+        const key = document.getElementById("key");
+        const text = document.getElementById("text");
+        const send = document.getElementById("send");
+        const sendStatus = document.getElementById("send-status");
+        const receiveLink = document.getElementById("receive-link");
+    
+        if (window.location.hash) {
+            key.value = window.location.hash.slice(1);
+        }
+    
+        key.onchange = _ => {
+            receiveLink.href = `contents/${key.value}`;
+            window.location.hash = key.value;
+        }
+    
+        key.onchange(null);
+    
+        async function post() {
+            sendStatus.innerText = "Posting..."
+            const response = await fetch(
+                `contents/${key.value}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    },
+                    body: text.value
+                }
+            );
+    
+            if (response.ok) {
+                sendStatus.innerText = await response.json();
+            } else {
+                sendStatus.innerText = `${response.status} ${response.statusText}`;
+            }
+        }
+    
+        send.onclick = post;
+    </script>
+</body>
+</html>
