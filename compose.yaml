@@ -1,0 +1,18 @@
+services:
+  exchange:
+    build: .
+    restart: unless-stopped
+    networks: ["no-internet"]
+  proxy:
+    build: nginx
+    restart: unless-stopped
+    depends_on:
+      - exchange
+    networks: ["no-internet", "custom-bridge"]
+    ports:
+      - "80:80"
+
+networks:
+  no-internet:
+    internal: true
+  custom-bridge:
